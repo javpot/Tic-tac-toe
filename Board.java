@@ -84,7 +84,11 @@ class Board
     public void print() {
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
-                System.out.print(board[i][j] + "\t");
+                if (board[i][j] == Mark.EMPTY) {
+                    System.out.print(" . \t");
+                } else {
+                    System.out.print(board[i][j] + "\t");
+                }
             }
             System.out.println();
         }
