@@ -23,78 +23,71 @@ class Board
     //
     // Ne pas changer la signature de cette méthode
     public void play(Move m, Mark mark){
-        int row = m.getRow();
-        int col = m.getCol();
-        if(board[row][col] == Mark.EMPTY){
-            board[row][col] = mark;
-            evaluate(mark);
+        if (board[m.getRow()][m.getCol()] == Mark.EMPTY) {
+            board[m.getRow()][m.getCol()] = mark;
         }
-        else{
-            System.out.println("Invalid move");
-        }
-
     }
 
+    public ArrayList<Move> getPossibleMoves() {
+        ArrayList<Move> moves = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (board[i][j] == Mark.EMPTY) {
+                    moves.add(new Move(i, j));
+                }
+            }
+        }
+
+        return moves;
+    }
+
+    public void undo(Move m) {
+        board[m.getRow()][m.getCol()] = Mark.EMPTY;
+    }
+
+    private boolean checkWinner(Mark mark) {
+        //lignes
+        for (int i = 0; i < 3; i++) {
+            if (board[i][0] == mark && board[i][1] == mark && board[i][2] == mark) {
+                return true;
+            }
+        }
+
+        //colonnes
+        for (int j = 0; j < 3; j++) {
+            if (board[0][j] == mark && board[1][j] == mark && board[2][j] == mark) {
+                return true;
+            }
+        }
+
+        //diagonales
+        if (board[0][0] == mark && board[1][1] == mark && board[2][2] == mark) return true;
+        if (board[0][2] == mark && board[1][1] == mark && board[2][0] == mark) return true;
+
+        return false;
+    }
 
     // retourne  100 pour une victoire
     //          -100 pour une défaite
     //           0   pour un match nul
     // Ne pas changer la signature de cette méthode
     public int evaluate(Mark mark){
-        if(mark == Mark.EMPTY){
-            return 0;
-        }
-        // Check rows and columns
-        for (int i = 0; i < 3; i++) {
-            if (board[i][0] == mark && board[i][1] == mark && board[i][2] == mark) {
-                return 100;
-            }
-            if (board[0][i] == mark && board[1][i] == mark && board[2][i] == mark) {
-                return 100;
-            }
-        }
-        // Check diagonals
-        if (board[0][0] == mark && board[1][1] == mark && board[2][2] == mark) {
-            return 100;
-        }
-        if (board[0][2] == mark && board[1][1] == mark && board[2][0] == mark) {
-            return 100;
-        }
-        // Check for opponent win
         Mark opponent = (mark == Mark.X) ? Mark.O : Mark.X;
-        for (int i = 0; i < 3; i++) {
-            if (board[i][0] == opponent && board[i][1] == opponent && board[i][2] == opponent) {
-                return -100;
-            }
-            if (board[0][i] == opponent && board[1][i] == opponent && board[2][i] == opponent) {
-                return -100;
-            }
-        }
-        if (board[0][0] == opponent && board[1][1] == opponent && board[2][2] == opponent) {
-            return -100;
-        }
-        if (board[0][2] == opponent && board[1][1] == opponent && board[2][0] == opponent) {
-            return -100;
-        }
-        // Check for draw or ongoing game
-        for (Mark[] marks : board) {
-            for (Mark m : marks) {
-                if (m == Mark.EMPTY) {
-                    return 0; // Game is still ongoing
-                }
-            }
-        }
-        return 0; // Draw
+
+        if (checkWinner(mark)) return 100;
+        if (checkWinner(opponent)) return -100;
+        if (getPossibleMoves().isEmpty()) return 0;
+
+        return 0;
     }
 
-    public String toString(){
-        StringBuilder sb = new StringBuilder();
-        for (Mark[] marks : board) {
-            for (Mark mark : marks) {
-                sb.append(mark).append(" ");
+    public void print() {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                System.out.print(board[i][j] + "\t");
             }
-            sb.append("\n");
+            System.out.println();
         }
-        return sb.toString();
+        System.out.println();
     }
 }
